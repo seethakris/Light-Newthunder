@@ -15,7 +15,9 @@ files_present = dir([Data_Folder,filesep, '*.tif']);
 
 %Now register all images using base. Save as multitiff
 for ff = 1:length(files_present)
-    
+     
+    File_string = files_present(ff).name;
+     
     info = imfinfo([Data_Folder, filesep, files_present(ff).name]); %Get image info
     num_t = numel(info);
     base = (imread([Data_Folder, filesep, files_present(ff).name], 1));

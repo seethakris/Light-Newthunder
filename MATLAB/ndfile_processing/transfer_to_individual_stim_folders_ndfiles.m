@@ -24,12 +24,20 @@ for ff = 1:length(files_present)
     find_underscore = strfind(File_string(find_fishnum+5:end),'_');
     Fish_Number = File_string(find_fishnum:find_fishnum+5+find_underscore(1)-2);
     
-    find_region = strfind(File_string, 'Bluex4');
+    find_block =   strfind(File_string, 'Block');
+    find_underscore = strfind(File_string(find_block+2:end),'_');
+    Block = File_string(find_block:find_block+find_underscore(1));
+    
+    find_stimulus = strfind(File_string, 'Block');
+    find_underscore = strfind(File_string(find_stimulus+5:end),'_');
+    Stimulus = File_string(find_stimulus+find_underscore(1)+5:find_stimulus+find_underscore(2)+3);
+    
+    
+    find_region = strfind(File_string, Stimulus);
     find_underscore = strfind(File_string(find_region+2:end),'_');
     Region = File_string(find_region+find_underscore(1)+2:find_region+find_underscore(2));
     
-    
-    Fish_Region_Folder = [Result_Folder, filesep, Fish_Number, filesep, Region, filesep];
+    Fish_Region_Folder = [Result_Folder, filesep, Fish_Number, filesep,  Stimulus, filesep, Region, filesep, Block, filesep];
     
     if ~isdir(Fish_Region_Folder)
         mkdir(Fish_Region_Folder)
