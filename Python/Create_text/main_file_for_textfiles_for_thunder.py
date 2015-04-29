@@ -20,7 +20,7 @@ from create_textfiles import create_textfile_individual, create_textfile_eachexp
 
 def  initial_function(Exp_Folder, filename_save_prefix, img_size_x, img_size_y, \
 img_size_crop_x1, img_size_crop_x2, img_size_crop_y1, img_size_crop_y2,  time_start,time_end, \
-median_filter_threshold, rewrite_flag,stimulus_pulse):
+median_filter_threshold, rewrite_flag,stimulus_on_time, stimulus_off_time):
     
     
     ##Create different types of text files and run analysis on them
@@ -50,7 +50,7 @@ median_filter_threshold, rewrite_flag,stimulus_pulse):
                 name_for_saving_figures = Stimulus_Directories[ii] + ' ' + Trial_Directories[jj]        
                 create_textfile_individual(Working_Directory, name_for_saving_files,  name_for_saving_figures, \
                 img_size_x, img_size_y, img_size_crop_x1, img_size_crop_x2, img_size_crop_y1, img_size_crop_y2, \
-                time_start,time_end, median_filter_threshold, text_file,stimulus_pulse)
+                time_start,time_end, median_filter_threshold, text_file,stimulus_on_time, stimulus_off_time)
                 print 'Saving to text file took '+ str(int(time.time()-start_time)) +' seconds'
                 text_file.write("'Saving to text file took %s seconds \n" %  str(int(time.time()-start_time)))
                 text_file.close()
@@ -78,7 +78,7 @@ median_filter_threshold, rewrite_flag,stimulus_pulse):
                 name_for_saving_figures = Stimulus_Directories[ii]       
                 create_textfile_eachexp(Working_Directory, name_for_saving_files, name_for_saving_figures, \
                 img_size_x, img_size_y, img_size_crop_x1, img_size_crop_x2, img_size_crop_y1, img_size_crop_y2,  \
-                time_start,time_end,  median_filter_threshold, text_file,stimulus_pulse)
+                time_start,time_end,  median_filter_threshold, text_file,stimulus_on_time, stimulus_off_time)
                 print 'Saving to text file took '+ str(int(time.time()-start_time)) +' seconds'
                 text_file.write("'Saving to text file took %s seconds \n" %  str(int(time.time()-start_time)))
                 text_file.close()
@@ -96,7 +96,7 @@ median_filter_threshold, rewrite_flag,stimulus_pulse):
                 print 'Saving images to text for all files in '+ Working_Directory
                 create_textfile_allexps(Working_Directory, name_for_saving_files, \
                 img_size_x, img_size_y, img_size_crop_x1, img_size_crop_x2, img_size_crop_y1, img_size_crop_y2,\
-                time_start,time_end, median_filter_threshold, text_file,stimulus_pulse)
+                time_start,time_end, median_filter_threshold, text_file,stimulus_on_time, stimulus_off_time)
                 print 'Saving to text file took '+ str(int(time.time()-start_time)) +' seconds'
                 text_file.write("'Saving to text file took %s seconds \n" %  str(int(time.time()-start_time)))
                 text_file.close()

@@ -25,7 +25,7 @@ smooth_window = 10
 
 def create_textfile_individual(Working_Directory, name_for_saving_files, name_for_saving_figures, \
 img_size_x, img_size_y, img_size_crop_x1, img_size_crop_x2, img_size_crop_y1, img_size_crop_y2,  \
-time_start,time_end, median_filter_threshold, text_file,stimulus_pulse):
+time_start,time_end, median_filter_threshold, text_file,stimulus_on_time, stimulus_off_time):
 
     pp = create_pdf(Working_Directory, name_for_saving_files) #To save as pdf
     
@@ -40,10 +40,10 @@ time_start,time_end, median_filter_threshold, text_file,stimulus_pulse):
     
     #Create proper matrix for textfile
     numpy_array_for_thunder = get_matrix_for_textfile(data_mat, name_for_saving_figures, z_planes, 0, np.size(data_mat,3) ,\
-    smooth_window, pp,stimulus_pulse)
+    smooth_window, pp,stimulus_on_time, stimulus_off_time)
     
     numpy_array_for_thunder_filtered = get_matrix_for_textfile(data_filtered_mat, name_for_saving_figures, z_planes, 0, np.size(data_mat,3) ,\
-    smooth_window, pp,stimulus_pulse)
+    smooth_window, pp,stimulus_on_time, stimulus_off_time)
     
     #Save as textfile
     pp.close()        
@@ -53,7 +53,7 @@ time_start,time_end, median_filter_threshold, text_file,stimulus_pulse):
 
 def create_textfile_eachexp(Working_Directory, name_for_saving_files, name_for_saving_figures, \
 img_size_x, img_size_y, img_size_crop_x1, img_size_crop_x2, img_size_crop_y1, img_size_crop_y2,\
-time_start,time_end, median_filter_threshold, text_file,stimulus_pulse):
+time_start,time_end, median_filter_threshold, text_file,stimulus_on_time, stimulus_off_time):
     
     pp = create_pdf(Working_Directory, name_for_saving_files) #To save as pdf
     
@@ -80,8 +80,8 @@ time_start,time_end, median_filter_threshold, text_file,stimulus_pulse):
         plot_pdf(data_filtered_mat, name_for_saving_figures1+' Filtered', pp) 
 
         #Create proper matrix for textfile
-        temp_numpy_array_for_thunder = get_matrix_for_textfile(data_mat, name_for_saving_figures1, z_planes, time_start, time_end,  smooth_window, pp,stimulus_pulse)
-        temp_numpy_array_for_thunder_filtered = get_matrix_for_textfile(data_filtered_mat, name_for_saving_figures1, z_planes, time_start, time_end, smooth_window, pp,stimulus_pulse)
+        temp_numpy_array_for_thunder = get_matrix_for_textfile(data_mat, name_for_saving_figures1, z_planes, time_start, time_end,  smooth_window, pp,stimulus_on_time, stimulus_off_time)
+        temp_numpy_array_for_thunder_filtered = get_matrix_for_textfile(data_filtered_mat, name_for_saving_figures1, z_planes, time_start, time_end, smooth_window, pp,stimulus_on_time, stimulus_off_time)
 
         
                 #Append each tiff files data to a bigger matrix
@@ -103,7 +103,7 @@ time_start,time_end, median_filter_threshold, text_file,stimulus_pulse):
 
 def create_textfile_allexps(Working_Directory, name_for_saving_files, \
 img_size_x, img_size_y, img_size_crop_x1, img_size_crop_x2, img_size_crop_y1, img_size_crop_y2, \
-time_start,time_end, median_filter_threshold, text_file,stimulus_pulse):
+time_start,time_end, median_filter_threshold, text_file,stimulus_on_time, stimulus_off_time):
     
     pp = create_pdf(Working_Directory, name_for_saving_files) #To save as pdf
     
@@ -132,8 +132,8 @@ time_start,time_end, median_filter_threshold, text_file,stimulus_pulse):
             plot_pdf(data_filtered_mat, name_for_saving_figures1+' Filtered', pp) 
 
             #Create proper matrix for textfile
-            temp_numpy_array_for_thunder = get_matrix_for_textfile(data_mat, name_for_saving_figures1, z_planes, time_start, time_end,  smooth_window, pp,stimulus_pulse)
-            temp_numpy_array_for_thunder_filtered = get_matrix_for_textfile(data_filtered_mat, name_for_saving_figures1, z_planes, time_start, time_end, smooth_window, pp,stimulus_pulse)
+            temp_numpy_array_for_thunder = get_matrix_for_textfile(data_mat, name_for_saving_figures1, z_planes, time_start, time_end,  smooth_window, pp,stimulus_on_time, stimulus_off_time)
+            temp_numpy_array_for_thunder_filtered = get_matrix_for_textfile(data_filtered_mat, name_for_saving_figures1, z_planes, time_start, time_end, smooth_window, pp,stimulus_on_time, stimulus_off_time)
 
                     #Append each tiff files data to a bigger matrix
             if numpy_array_for_thunder is None:
@@ -310,7 +310,7 @@ def plot_pdf(data, name_for_saving_figures, pp):
             plt.close()
             
 #Create numpy arrays to save as textfiles 
-def get_matrix_for_textfile(data_mat, name_for_saving_files, num_z_planes, time_start,time_end, smooth_window, pp,stimulus_pulse):
+def get_matrix_for_textfile(data_mat, name_for_saving_files, num_z_planes, time_start,time_end, smooth_window, pp,stimulus_on_time, stimulus_off_time):
     
     #Save as numpy array
     print 'Creating array from stack for ' + name_for_saving_files
@@ -345,7 +345,8 @@ def get_matrix_for_textfile(data_mat, name_for_saving_files, num_z_planes, time_
 
             fig2 = plt.imshow(C[-1000:,:],aspect='auto', cmap='jet')
             
-            plot_vertical_lines(stimulus_pulse)
+            plot_vertical_lines_onset(stimulus_on_time)
+            plot_vertical_lines_offset(stimulus_off_time)
             plt.title(name_for_saving_files +' Z='+ str(zz+1))
             plt.colorbar()
             fig2 = plt.gcf()
@@ -355,60 +356,13 @@ def get_matrix_for_textfile(data_mat, name_for_saving_files, num_z_planes, time_
 
     return temp_numpy_array_for_thunder
     
-def plot_vertical_lines(stimulus_pulse):
   
-    if stimulus_pulse == 1:
-        
-        plt.axvline(x=46, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=65, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=98, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=117, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=142, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=161, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=194, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=213, linestyle='--', color='k', linewidth=1)
-    
-    elif stimulus_pulse == 2:
-        
-        plt.axvline(x=46, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=106, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=127, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=188, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=209, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=270, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=291, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=352, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=373, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=433, linestyle='--', color='k', linewidth=1)
-                      
-    elif stimulus_pulse==3:
-        
-        plt.axvline(x=46, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=65, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=86, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=106, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=127, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=147, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=168, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=188, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=209, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=229, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=249, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=269, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=291, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=310, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=332, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=352, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=373, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=393, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=414, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=434, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=455, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=475, linestyle='--', color='k', linewidth=1)
-        plt.axvline(x=496, linestyle='-', color='k', linewidth=1)
-        plt.axvline(x=516, linestyle='--', color='k', linewidth=1)
-        
+def plot_vertical_lines_onset(stimulus_on_time):
+    for ii in xrange(0,np.size(stimulus_on_time)):
+        plt.axvline(x=stimulus_on_time[ii], linestyle='-', color='k', linewidth=1)
 
-    
+def plot_vertical_lines_offset(stimulus_off_time):
+    for ii in xrange(0,np.size(stimulus_off_time)):
+        plt.axvline(x=stimulus_off_time[ii], linestyle='--', color='k', linewidth=1)
         
     
