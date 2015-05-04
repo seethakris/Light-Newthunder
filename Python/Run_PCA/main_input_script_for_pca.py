@@ -8,7 +8,7 @@ Created on Mon Jan 26 17:07:18 2015
 
 
 ## Enter Main Folder containing stimulus folders to create text files
-Exp_Folder ='/Users/seetha/Desktop/Ruey_Habenula/Habenula/Long_Stimulus/Tiff/Cropped/Registered/Sorted/Fish473/Bluex4/'
+Exp_Folder ='/Users/seetha/Desktop/Ruey_Habenula/Habenula/Short_Stimulus/Fish104_Block2_Blue&UV1c/'
 filename_save_prefix_forPCA = 'Test1'
 filename_save_prefix_for_textfile = 'Test1'
 
@@ -19,7 +19,7 @@ files_to_do_PCA = [1,0,0] #Individual PCA, Each_exp PCA, All_exp PCA
 use_existing_parameters = 0
 
 #Redo pca - 1
-redo_pca = 0
+redo_pca = 1
 
 # Required pcs from what was received previously
 required_pcs = 0
@@ -47,12 +47,13 @@ color_map_allexp= 'polar' #Colormap for plotting principle components
 
 
 #Stimulus on and off time and define onset and offset times of the light stimulus
-stimulus_pulse = 2 ##Whether it is a long, medium or short light stimulus
+stimulus_pulse = 1 ##Whether it is a long, medium or short light stimulus
+num_fish_used = 1
 
 if stimulus_pulse == 1:
     stimulus_on_time = [46,98,142,194]
     stimulus_off_time = [65,117,161,213]
-    color_mat = ['#00FFFF','#0000A0','#800080','#FF00FF']
+    color_mat = ['#00FFFF','#0000A0','#800080','#FF00FF', '#800000']
 
     
 elif stimulus_pulse == 2:
@@ -65,7 +66,11 @@ elif stimulus_pulse == 3:
     stimulus_on_time = [46,86,127,168, 209, 249, 291, 332, 373, 414, 455,496]
     stimulus_off_time = [65,106,147,188,229,269,310,352,393,434,475,516]
     color_mat = ['#00FFFF','#0000A0','#800080','#FF00FF', '#800000', '#A52A2A','#FFA500','#FF0000','#00FF00','#008000','#808000','#FFFF00']
-
+    
+elif stimulus_pulse == 4:
+    stimulus_on_time = [46,98,142,194,46+311,98+311,142+311,194+311]
+    stimulus_off_time = [65,117,161,213,65+311,117+311,161+311,213+311]
+    color_mat = ['#00FFFF','#0000A0','#800080','#FF00FF', '#800000']
 
 ## How long is the baseline?
 time_baseline = 30
@@ -99,15 +104,15 @@ tsc = ThunderContext.start(appName="thunderpca")
 
 if files_to_do_PCA[0]== 1:
     run_analysis_individualexps(Exp_Folder, filename_save_prefix_forPCA, filename_save_prefix_for_textfile, pca_components_ind, num_pca_colors_ind, num_samples_ind, thresh_pca_ind, color_map_ind,\
-    tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline )
+    tsc,redo_pca, num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline )
     
 if files_to_do_PCA[1]== 1:
     run_analysis_eachexp(Exp_Folder, filename_save_prefix_forPCA, filename_save_prefix_for_textfile, pca_components_eachexp, num_pca_colors_eachexp, num_samples_eachexp, thresh_pca_eachexp, color_map_eachexp,\
-    tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline )
+    tsc,redo_pca, num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline )
 
 if files_to_do_PCA[2]== 1:
     run_analysis_allexp(Exp_Folder, filename_save_prefix_forPCA, filename_save_prefix_for_textfile, pca_components_allexp, num_pca_colors_allexp, num_samples_allexp, thresh_pca_allexp, color_map_allexp,\
-    tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline )
+    tsc,redo_pca, num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline )
     
 ############# Save all imput parameters
 with open(Exp_Folder+filename_save_prefix_forPCA+'_save_pca_variables', 'w') as f:

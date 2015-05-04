@@ -24,7 +24,7 @@ z_direction = 'z'
 
 def plot_pca_maps(Working_Directory, name_for_saving_figures, name_for_saving_files, \
 pca_components, maps, pts, pts_nonblack, clrs, clrs_nonblack, recon, unique_clrs, matched_pixels,\
-matched_signals, flag,stimulus_on_time, stimulus_off_time,color_mat, required_pcs, data):
+matched_signals, flag,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat, required_pcs, data):
     
     if required_pcs == 0:
         required_pcs = [1,2,3]
@@ -81,17 +81,17 @@ matched_signals, flag,stimulus_on_time, stimulus_off_time,color_mat, required_pc
         ### Plot PCA projections in 3D
         ax2 = fig3.add_subplot(131, projection='3d')
         if np.size(required_pcs)<3:
-            plot_pca_components_in3d(pca_components,ax2,stimulus_on_time, stimulus_off_time,color_mat,[1,2,3],z_direction)
+            plot_pca_components_in3d(pca_components,ax2,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,[1,2,3],z_direction)
         else:
-            plot_pca_components_in3d(pca_components,ax2,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,z_direction)
+            plot_pca_components_in3d(pca_components,ax2,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,z_direction)
         
         ## Plot projections in 2D
         ax2 = plt.subplot(132)
         if np.size(required_pcs)==3:
-            plot_pca_components_in2d(pca_components,ax2,stimulus_on_time, stimulus_off_time,color_mat,[1,2])
+            plot_pca_components_in2d(pca_components,ax2,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,[1,2])
         else:
             print required_pcs
-            plot_pca_components_in2d(pca_components,ax2,stimulus_on_time, stimulus_off_time,color_mat, required_pcs)
+            plot_pca_components_in2d(pca_components,ax2,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat, required_pcs)
        
         ### Plot scatter plots in 3D
         ax2 = plt.subplot(133, projection='3d')
@@ -390,19 +390,27 @@ def plot_pca_components(pca_components,ax1,stimulus_on_time, stimulus_off_time,r
     plot_vertical_lines_onset(stimulus_on_time)
     plot_vertical_lines_offset(stimulus_off_time)
         
-def plot_pca_components_in3d(pca_components,ax1,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,z_direction):
+def plot_pca_components_in3d(pca_components,ax1,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,z_direction):
     
-    ########### Plot components in 3D ##################      
-    plot_stimulus_in_3d(ax1, pca_components, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,z_direction)
+    ########### Plot components in 3D ##################    
+    if stimulus_pulse>3:
+        plot_stimulus_in_3d_combined_fish(ax1, pca_components, num_fish_used, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,z_direction)
+    else:
+        plot_stimulus_in_3d(ax1, pca_components, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,z_direction)
     ## plot axis labels according to zdirection
     plot_axis_labels_byzdir(ax1,z_direction,required_pcs)
     
 
     
-def plot_pca_components_in2d(pca_components,ax1,stimulus_on_time, stimulus_off_time,color_mat, required_pcs):
+def plot_pca_components_in2d(pca_components,ax1,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat, required_pcs):
     ########### Plot components in 3D ##################  
-    plot_stimulus_in_2d(ax1, pca_components, stimulus_on_time, stimulus_off_time,color_mat,required_pcs)
+    if stimulus_pulse>3:
+        plot_stimulus_in_2d_combined_fish(ax1, pca_components, num_fish_used, stimulus_on_time, stimulus_off_time, color_mat,required_pcs)
+    else:
+        plot_stimulus_in_2d(ax1, pca_components, stimulus_on_time, stimulus_off_time,color_mat,required_pcs)
+    
     legend_for_2d_plot(ax1, stimulus_off_time)
+        
     ax1.set_xlabel('PC'+str(required_pcs[0]))
     ax1.set_ylabel('PC'+str(required_pcs[1]))
         
@@ -522,7 +530,61 @@ def plot_stimulus_in_3d(ax1, pca_components, stimulus_on_time, stimulus_off_time
     ax1.plot(pca_components[stimulus_off_time[ii]+20:,required_pcs[0]], \
     pca_components[stimulus_off_time[ii]+20:,required_pcs[1]],\
     pca_components[stimulus_off_time[ii]+20:,required_pcs[2]],  zdir=z_direction,color='#000000', linewidth=3)
+
+def plot_stimulus_in_3d_combined_fish(ax1, pca_components, num_fish_used, stimulus_on, stimulus_off, color_mat, required_pcs, z_direction):
     
+    # Initialize soem parameters
+    size_stimulus = np.size(stimulus_on)/num_fish_used
+    size_time = np.size(pca_components,0)/num_fish_used
+    count = 0
+    time_start = 0
+    time_end = size_time
+    
+    for nn in xrange(0, num_fish_used):
+        #print some stuff for verification   
+        print size_stimulus, size_time, time_end, time_start
+        
+        #Create a matrix for stimulus on time of individual fish
+        stimulus_on_time = stimulus_on[count:count+size_stimulus] 
+        stimulus_off_time = stimulus_off[count:count+size_stimulus]
+        count += size_stimulus
+        
+        print stimulus_on_time, stimulus_off_time
+        
+        ## Plot Baseline
+        ax1.plot(pca_components[time_start:stimulus_on_time[0],required_pcs[0]], \
+        pca_components[time_start:stimulus_on_time[0],required_pcs[1]],\
+        pca_components[time_start:stimulus_on_time[0],required_pcs[2]],\
+        color='#808080', linewidth=3+(nn))
+            
+        for ii in xrange(0,np.size(stimulus_on_time)):
+            ax1.plot(pca_components[stimulus_on_time[ii]:stimulus_off_time[ii],required_pcs[0]], \
+            pca_components[stimulus_on_time[ii]:stimulus_off_time[ii],required_pcs[1]],\
+            pca_components[stimulus_on_time[ii]:stimulus_off_time[ii],required_pcs[2]],\
+            color=color_mat[ii], linewidth=3+(nn))
+        
+        ## Plot Baseline
+        ax1.plot(pca_components[stimulus_off_time[ii]+20:time_end,required_pcs[0]], \
+        pca_components[stimulus_off_time[ii]+20:time_end,required_pcs[1]],\
+        pca_components[stimulus_off_time[ii]+20:time_end,required_pcs[2]],\
+        color='#000000', linewidth=3+(nn))
+        
+        for ii in xrange(0,np.size(stimulus_on_time)):
+            if ii == np.size(stimulus_on_time)-1:
+                ax1.plot(pca_components[stimulus_off_time[ii]:stimulus_off_time[ii]+20,required_pcs[0]], \
+                pca_components[stimulus_off_time[ii]:stimulus_off_time[ii]+20,required_pcs[1]],\
+                pca_components[stimulus_off_time[ii]:stimulus_off_time[ii]+20,required_pcs[2]],\
+                color=color_mat[ii], linewidth=2+(nn), linestyle='--')
+            else:
+                ax1.plot(pca_components[stimulus_off_time[ii]:stimulus_on_time[ii+1],required_pcs[0]], \
+                pca_components[stimulus_off_time[ii]:stimulus_on_time[ii+1],required_pcs[1]],\
+                pca_components[stimulus_off_time[ii]:stimulus_on_time[ii+1],required_pcs[2]],\
+                color=color_mat[ii], linewidth=2+(nn), linestyle='--')
+        
+        #Create a matric for time start and time end of each fish        
+        time_start += time_end
+        time_end += time_end+size_time
+        
     
 def plot_stimulus_in_2d(ax1, pca_components, stimulus_on_time, stimulus_off_time, color_mat, required_pcs):
     
@@ -551,7 +613,56 @@ def plot_stimulus_in_2d(ax1, pca_components, stimulus_on_time, stimulus_off_time
             pca_components[stimulus_off_time[ii]:stimulus_on_time[ii+1],required_pcs[1]],\
             color=color_mat[ii], linewidth=2, linestyle='--')
     
-
+def plot_stimulus_in_2d_combined_fish(ax1, pca_components, num_fish_used, stimulus_on, stimulus_off, color_mat, required_pcs):
+    
+    # Initialize soem parameters
+    size_stimulus = np.size(stimulus_on)/num_fish_used
+    size_time = np.size(pca_components,0)/num_fish_used
+    count = 0
+    time_start = 0
+    time_end = size_time
+    
+    for nn in xrange(0, num_fish_used):
+        #print some stuff for verification   
+        print size_stimulus, size_time, time_end, time_start
+        
+        #Create a matrix for stimulus on time of individual fish
+        stimulus_on_time = stimulus_on[count:count+size_stimulus] 
+        stimulus_off_time = stimulus_off[count:count+size_stimulus]
+        count += size_stimulus
+        
+        print stimulus_on_time, stimulus_off_time
+        
+        ## Plot Baseline
+        ax1.plot(pca_components[time_start:stimulus_on_time[0],required_pcs[0]], \
+        pca_components[time_start:stimulus_on_time[0],required_pcs[1]],\
+        color='#808080', linewidth=3+(nn))
+            
+        for ii in xrange(0,np.size(stimulus_on_time)):
+            ax1.plot(pca_components[stimulus_on_time[ii]:stimulus_off_time[ii],required_pcs[0]], \
+            pca_components[stimulus_on_time[ii]:stimulus_off_time[ii],required_pcs[1]],\
+            color=color_mat[ii], linewidth=3+(nn))
+        
+        ## Plot Baseline
+        ax1.plot(pca_components[stimulus_off_time[ii]+20:time_end,required_pcs[0]], \
+        pca_components[stimulus_off_time[ii]+20:time_end,required_pcs[1]],\
+        color='#000000', linewidth=3+(nn))
+        
+        for ii in xrange(0,np.size(stimulus_on_time)):
+            if ii == np.size(stimulus_on_time)-1:
+                ax1.plot(pca_components[stimulus_off_time[ii]:stimulus_off_time[ii]+20,required_pcs[0]], \
+                pca_components[stimulus_off_time[ii]:stimulus_off_time[ii]+20,required_pcs[1]],\
+                color=color_mat[ii], linewidth=2+(nn), linestyle='--')
+            else:
+                ax1.plot(pca_components[stimulus_off_time[ii]:stimulus_on_time[ii+1],required_pcs[0]], \
+                pca_components[stimulus_off_time[ii]:stimulus_on_time[ii+1],required_pcs[1]],\
+                color=color_mat[ii], linewidth=2+(nn), linestyle='--')
+        
+        #Create a matric for time start and time end of each fish        
+        time_start += time_end
+        time_end += time_end+size_time
+        
+        
     
 def legend_for_2d_plot(ax1, stimulus_off_time):
     A = []

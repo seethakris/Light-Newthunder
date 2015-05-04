@@ -23,7 +23,7 @@ image = Colorize.image
 
 ## PCA on individual exps
 def run_analysis_individualexps(Exp_Folder, filename_save_prefix_forPCA, filename_save_prefix_for_textfile, pca_components, num_pca_colors, num_samples, thresh_pca,\
-color_map, tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline):
+color_map, tsc,redo_pca, num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline):
 
 
     Stimulus_Directories = [f for f in os.listdir(Exp_Folder) if os.path.isdir(os.path.join(Exp_Folder, f)) and f.find('Figures')<0]
@@ -43,7 +43,7 @@ color_map, tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_p
             
             if len(txt_file)>0:
                 #Load data        
-                data_filtered = tsc.loadSeries(Working_Directory+name_for_saving_files+'_filtered.txt', inputFormat='text', nkeys=3).toTimeSeries().detrend(method='nonlin', order=15)
+                data_filtered = tsc.loadSeries(Working_Directory+name_for_saving_files+'_filtered.txt', inputFormat='text', nkeys=3).toTimeSeries().detrend(method='linear', order=5)
                 data_background = tsc.loadSeries(Working_Directory+name_for_saving_files+'.txt', inputFormat='text', nkeys=3)
                 
 #                data_plotting = copy(data_filtered)
@@ -56,11 +56,11 @@ color_map, tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_p
                 flag = 0
                 name_for_saving_files = Stimulus_Directories[ii] + '_' + Trial_Directories[jj] + filename_save_prefix_forPCA+'_individualtrial'
                 run_pca_thunder(Working_Directory, name_for_saving_figures, name_for_saving_files, redo_pca, data_filtered,\
-                data_background,pca_components, num_pca_colors, num_samples, thresh_pca, color_map,  flag,stimulus_on_time, stimulus_off_time,color_mat,required_pcs)
+                data_background,pca_components, num_pca_colors, num_samples, thresh_pca, color_map,  flag,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs)
                 
     
 def run_analysis_eachexp(Exp_Folder, filename_save_prefix_forPCA, filename_save_prefix_for_textfile, pca_components, num_pca_colors, num_samples, thresh_pca, color_map,\
-tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline):
+tsc,redo_pca,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline):
     
     Stimulus_Directories = [f for f in os.listdir(Exp_Folder) if os.path.isdir(os.path.join(Exp_Folder, f)) and f.find('Figures')<0]            
     for ii in xrange(0, np.size(Stimulus_Directories, axis = 0)):
@@ -72,7 +72,7 @@ tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_bas
 
         if len(txt_file)>0:
            #Load data                    
-            data_filtered = tsc.loadSeries(Working_Directory+name_for_saving_files+'_filtered.txt', inputFormat='text', nkeys=3).toTimeSeries().detrend(method='linear', order=8)
+            data_filtered = tsc.loadSeries(Working_Directory+name_for_saving_files+'_filtered.txt', inputFormat='text', nkeys=3).toTimeSeries().detrend(method='linear', order=5)
             data_background = tsc.loadSeries(Working_Directory+name_for_saving_files+'.txt', inputFormat='text', nkeys=3)
             
             
@@ -83,11 +83,11 @@ tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_bas
             flag = 1
             name_for_saving_files = Stimulus_Directories[ii] + '_'+ filename_save_prefix_forPCA+'_eachexp'
             run_pca_thunder(Working_Directory, name_for_saving_figures, name_for_saving_files, redo_pca, data_filtered,\
-            data_background, pca_components, num_pca_colors, num_samples, thresh_pca, color_map, flag,stimulus_on_time, stimulus_off_time,color_mat,required_pcs)
+            data_background, pca_components, num_pca_colors, num_samples, thresh_pca, color_map, flag,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs)
             
     
 def run_analysis_allexp(Exp_Folder, filename_save_prefix_forPCA, filename_save_prefix_for_textfile, pca_components, num_pca_colors, num_samples, thresh_pca, color_map,\
- tsc,redo_pca,stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline):
+ tsc,redo_pca,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs,time_baseline):
     
     Working_Directory = Exp_Folder
         
@@ -96,7 +96,7 @@ def run_analysis_allexp(Exp_Folder, filename_save_prefix_forPCA, filename_save_p
     
     if len(txt_file)>0:
        #Load data                    
-        data_filtered = tsc.loadSeries(Working_Directory+name_for_saving_files+'_filtered.txt', inputFormat='text', nkeys=3).toTimeSeries().detrend(method='linear', order=8)
+        data_filtered = tsc.loadSeries(Working_Directory+name_for_saving_files+'_filtered.txt', inputFormat='text', nkeys=3).toTimeSeries().detrend(method='linear', order=5)
         data_background = tsc.loadSeries(Working_Directory+name_for_saving_files+'.txt', inputFormat='text', nkeys=3)
                 
         data_filtered.center()
@@ -107,11 +107,11 @@ def run_analysis_allexp(Exp_Folder, filename_save_prefix_forPCA, filename_save_p
         flag = 2
         name_for_saving_files = 'All_exps_'+ filename_save_prefix_forPCA +'_eachexp'
         run_pca_thunder(Working_Directory, name_for_saving_figures, name_for_saving_files, redo_pca, data_filtered,\
-        data_background, pca_components, num_pca_colors, num_samples, thresh_pca, color_map, flag,stimulus_on_time, stimulus_off_time,color_mat,required_pcs)
+        data_background, pca_components, num_pca_colors, num_samples, thresh_pca, color_map, flag,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs)
 
     
 def run_pca_thunder(Working_Directory, name_for_saving_figures, name_for_saving_files, redo_pca, data,data_background,\
-pca_components, num_pca_colors, num_samples, thresh_pca, color_map,  flag,stimulus_on_time, stimulus_off_time,color_mat, required_pcs):
+pca_components, num_pca_colors, num_samples, thresh_pca, color_map,  flag,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat, required_pcs):
     
     
     ### If pca result files exists, then dont run any more pca, just do plotting, 
@@ -160,7 +160,7 @@ pca_components, num_pca_colors, num_samples, thresh_pca, color_map,  flag,stimul
     text_file.write("Plotting pca in %s \n" % Working_Directory)
     print 'Plotting pca in for all files...in '+ Working_Directory
     plot_pca_maps(Working_Directory, name_for_saving_figures, name_for_saving_files, \
-    pca_components, maps, pts, pts_nonblack, clrs, clrs_nonblack, recon, unique_clrs, matched_pixels, matched_signals,  flag,stimulus_on_time, stimulus_off_time,color_mat,required_pcs, data_background)
+    pca_components, maps, pts, pts_nonblack, clrs, clrs_nonblack, recon, unique_clrs, matched_pixels, matched_signals,  flag,num_fish_used, stimulus_pulse, stimulus_on_time, stimulus_off_time,color_mat,required_pcs, data_background)
     print 'Plotting pca in '+ str(int(time.time()-start_time)) +' seconds' 
     text_file.write("Plotting pca in took %s seconds \n" %  str(int(time.time()-start_time)))
     
