@@ -21,6 +21,8 @@ for ii = 1:length(sorted_foldernames)
         for jj = 1:num_stack
             Directory_Name = [Main_Directory_Name, sorted_foldernames{ii}, filesep, 'Z=', int2str(jj)];
             
+            %% Normalize Images
+            
             %% Register images
             disp(['Registering images....for ', Directory_Name])
             image_register(Directory_Name)
