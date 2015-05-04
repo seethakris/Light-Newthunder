@@ -21,7 +21,7 @@ from scipy import ndimage, misc
 
 #Custom libraries
 from smooth import smooth
-smooth_window = 10
+smooth_window = 30
 
 def create_textfile_individual(Working_Directory, name_for_saving_files, name_for_saving_figures, \
 img_size_x, img_size_y, img_size_crop_x1, img_size_crop_x2, img_size_crop_y1, img_size_crop_y2,  \
